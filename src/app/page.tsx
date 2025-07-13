@@ -172,75 +172,80 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
   const accuracyColor = accuracy >= 80 ? "text-green-600" : "text-red-600";
 
   
-  return (
-    <div
-      className="max-w-3xl mx-auto mt-10 p-4"
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-    >
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2 md:gap-0">
-        <h1 className="text-2xl font-bold text-center md:text-left">Trener czasowników nieregularnych</h1>
-        <div className={`text-center md:text-right text-sm md:text-base ${accuracyColor}`}>
-          <p>Odpowiedzi: <strong>{correctAnswers}/{totalAnswers}</strong></p>
-          <p>Skuteczność: <strong>{accuracy}%</strong></p>
-        </div>
+return (
+  <div
+    className="max-w-3xl mx-auto mt-10 p-4 bg-gray-900 text-white rounded shadow-md"
+    onKeyDown={handleKeyDown}
+    tabIndex={0}
+  >
+    <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2 md:gap-0">
+      <h1 className="text-2xl font-bold text-center md:text-left">
+        Trener czasowników nieregularnych
+      </h1>
+      <div className={`text-center md:text-right text-sm md:text-base ${accuracyColor}`}>
+        <p>Odpowiedzi: <strong>{correctAnswers}/{totalAnswers}</strong></p>
+        <p>Skuteczność: <strong>{accuracy}%</strong></p>
       </div>
-
-      <Card className="shadow-xl">
-        <CardContent className="space-y-4">
-          <h2 className="text-xl font-semibold text-center md:text-left">
-            Tłumaczenie: <span className="text-blue-600">{currentVerb.translation}</span>
-          </h2>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block mb-1">Base:</label>
-              <input
-  ref={baseInputRef}
-  value={inputBase}
-  onChange={(e) => setInputBase(e.target.value)}
-  className="w-full border rounded px-2 py-1"
-/>
-            </div>
-            <div>
-              <label className="block mb-1">Past Simple:</label>
-              <Input
-                value={inputPast}
-                onChange={(e) => setInputPast(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <label className="block mb-1">Past Participle:</label>
-              <Input
-                value={inputParticiple}
-                onChange={(e) => setInputParticiple(e.target.value)}
-                className="w-full"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:justify-start sm:gap-2 gap-2">
-            <Button className="w-full sm:w-auto" onClick={checkAnswers}>Sprawdź</Button>
-            <Button variant="secondary" className="w-full sm:w-auto" onClick={nextVerb}>Następne</Button>
-            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowAnswer(true)}>Pokaż odpowiedź</Button>
-          </div>
-
-          {result && <p className="text-lg font-medium text-center md:text-left">{result}</p>}
-
-          {showAnswer && (
-            <div className="text-sm text-gray-600 text-center md:text-left">
-              <p>Base: <strong>{currentVerb.base}</strong></p>
-              <p>Past: <strong>{currentVerb.past}</strong></p>
-              <p>Participle: <strong>{currentVerb.participle}</strong></p>
-            </div>
-          )}
-
-          <div className="text-xs text-gray-500 pt-4 text-center">
-            <p>Enter — sprawdź / przejdź dalej, Spacja — pokaż odpowiedź</p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
-  );
-}
+
+    <Card className="bg-gray-800 text-white shadow-xl">
+      <CardContent className="space-y-4">
+        <h2 className="text-xl font-semibold text-center md:text-left">
+          Tłumaczenie: <span className="text-blue-400">{currentVerb.translation}</span>
+        </h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block mb-1 text-gray-300">Base:</label>
+            <input
+              ref={baseInputRef}
+              value={inputBase}
+              onChange={(e) => setInputBase(e.target.value)}
+              className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 text-gray-300">Past Simple:</label>
+            <Input
+              value={inputPast}
+              onChange={(e) => setInputPast(e.target.value)}
+              className="w-full bg-gray-700 border border-gray-600 text-white"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 text-gray-300">Past Participle:</label>
+            <Input
+              value={inputParticiple}
+              onChange={(e) => setInputParticiple(e.target.value)}
+              className="w-full bg-gray-700 border border-gray-600 text-white"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:justify-start sm:gap-2 gap-2">
+          <Button className="w-full sm:w-auto">Sprawdź</Button>
+          <Button variant="secondary" className="w-full sm:w-auto">Następne</Button>
+          <Button variant="outline" className="w-full sm:w-auto">Pokaż odpowiedź</Button>
+        </div>
+
+        {result && (
+          <p className="text-lg font-medium text-center md:text-left text-green-400">
+            {result}
+          </p>
+        )}
+
+        {showAnswer && (
+          <div className="text-sm text-gray-300 text-center md:text-left">
+            <p>Base: <strong>{currentVerb.base}</strong></p>
+            <p>Past: <strong>{currentVerb.past}</strong></p>
+            <p>Participle: <strong>{currentVerb.participle}</strong></p>
+          </div>
+        )}
+
+        <div className="text-xs text-gray-500 pt-4 text-center">
+          <p>Enter — sprawdź / przejdź dalej, Spacja — pokaż odpowiedź</p>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);
