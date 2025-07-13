@@ -149,10 +149,8 @@ const nextVerb = () => {
   }, 0);
 };
 
-continue = (e: React.FormEvent<HTMLInputElement>) => {
-  e.preventDefault()
-}
-const handleKeyDown = (e) => {
+
+const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
   if (e.key === "Enter") {
     if (showAnswer || answeredCorrectly) {
       nextVerb();
