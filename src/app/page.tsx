@@ -5,7 +5,7 @@ import { useState, useRef, } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+//test
 const verbs = [
   { base: "arise", past: "arose", participle: "arisen", translation: "powstawać" },
   { base: "awake", past: "awoke", participle: "awoken", translation: "budzić się" },
@@ -149,7 +149,9 @@ const nextVerb = () => {
   }, 0);
 };
 
-
+continue = (e: React.FormEvent<HTMLInputElement>) => {
+  e.preventDefault()
+}
 const handleKeyDown = (e) => {
   if (e.key === "Enter") {
     if (showAnswer || answeredCorrectly) {
