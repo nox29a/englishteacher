@@ -243,7 +243,7 @@ return (
         )}
 
         <div className="text-xs text-gray-500 pt-4 text-center">
-          <p>Enter — sprawdź / przejdź dalej, Spacja — pokaż odpowiedź</p>
+          <p>TAB - Przejdź do następnego pola, Enter — sprawdź / przejdź dalej, Spacja — pokaż odpowiedź</p>
         </div>
       </CardContent>
     </Card>
