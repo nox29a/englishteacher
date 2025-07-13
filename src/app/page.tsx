@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, type RefObject } from "react";
+import { useState, useRef, } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
