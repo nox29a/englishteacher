@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, type RefObject } from "react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,7 +110,7 @@ export default function IrregularVerbsTrainer() {
   const [currentVerb, setCurrentVerb] = useState(verbs[0]);
   const [inputBase, setInputBase] = useState("");
   const [inputPast, setInputPast] = useState("");
-  const baseInputRef = useRef(null);
+  const baseInputRef = useRef<HTMLInputElement>(null);
   const [inputParticiple, setInputParticiple] = useState("");
   const [result, setResult] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
@@ -194,12 +195,12 @@ const handleKeyDown = (e) => {
           <div className="space-y-4">
             <div>
               <label className="block mb-1">Base:</label>
-              <Input
-                ref={baseInputRef}
-                value={inputBase}
-                onChange={(e) => setInputBase(e.target.value)}
-                className="w-full"
-              />
+              <input
+  ref={baseInputRef}
+  value={inputBase}
+  onChange={(e) => setInputBase(e.target.value)}
+  className="w-full border rounded px-2 py-1"
+/>
             </div>
             <div>
               <label className="block mb-1">Past Simple:</label>
