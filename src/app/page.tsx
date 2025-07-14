@@ -222,11 +222,37 @@ return (
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:justify-start sm:gap-2 gap-2">
-          <Button className="w-full sm:w-auto">Sprawdź</Button>
-          <Button variant="secondary" className="w-full sm:w-auto">Następne</Button>
-          <Button variant="outline" className="w-full sm:w-auto">Pokaż odpowiedź</Button>
-        </div>
+<div className="flex flex-col sm:flex-row sm:justify-start sm:gap-2 gap-2">
+  <Button
+    onClick={() => {
+      if (showAnswer || answeredCorrectly) {
+        nextVerb();
+      } else {
+        checkAnswers();
+      }
+    }}
+    className="w-full sm:w-auto"
+  >
+    Sprawdź
+  </Button>
+
+  <Button
+    variant="secondary"
+    onClick={nextVerb}
+    className="w-full sm:w-auto"
+  >
+    Następne
+  </Button>
+
+  <Button
+    variant="outline"
+    onClick={() => setShowAnswer(true)}
+    className="w-full sm:w-auto"
+  >
+    Pokaż odpowiedź
+  </Button>
+</div>
+
 
         {result && (
           <p className="text-lg font-medium text-center md:text-left text-green-400">
