@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, } from "react";
+import { useState, useEffect useRef, } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -108,6 +108,7 @@ const verbs = [
 
 export default function IrregularVerbsTrainer() {
   const [currentVerb, setCurrentVerb] = useState(verbs[0]);
+  const [timeSpent, setTimeSpent] = useState(0);
   const [inputBase, setInputBase] = useState("");
   const [inputPast, setInputPast] = useState("");
   const baseInputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +118,13 @@ export default function IrregularVerbsTrainer() {
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
   const [totalAnswers, setTotalAnswers] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setTimeSpent(prev => prev + 1);
+  }, 1000);
+  return () => clearInterval(interval); // czyścimy po odmontowaniu
+}, []);
 
   const checkAnswers = () => {
     const isBaseCorrect = inputBase.trim().toLowerCase() === currentVerb.base;
@@ -149,6 +157,12 @@ const nextVerb = () => {
   }, 0);
 };
 
+const formatTime = (totalSeconds: number) => {
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
+};
 
 const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
   if (e.key === "Enter") {
@@ -182,10 +196,11 @@ return (
       <h1 className="text-2xl font-bold text-center md:text-left">
         Trener czasowników nieregularnych
       </h1>
-      <div className={`text-center md:text-right text-sm md:text-base ${accuracyColor}`}>
-        <p>Odpowiedzi: <strong>{correctAnswers}/{totalAnswers}</strong></p>
-        <p>Skuteczność: <strong>{accuracy}%</strong></p>
-      </div>
+<div className={`text-center md:text-right text-sm md:text-base ${accuracyColor}`}>
+  <p>Odpowiedzi: <strong>{correctAnswers}/{totalAnswers}</strong></p>
+  <p>Skuteczność: <strong>{accuracy}%</strong></p>
+  <p>Czas: <strong>{formatTime(timeSpent)}</strong></p>
+</div>
     </div>
 
     <Card className="bg-gray-800 text-white shadow-xl">
@@ -238,7 +253,13 @@ return (
 
   <Button
     variant="secondary"
-    onClick={nextVerb}
+    onClick={() => {
+      // Jeżeli nie było poprawnej odpowiedzi ani nie pokazano odpowiedzi, traktuj jako błąd
+      if (!answeredCorrectly && !showAnswer) {
+        setTotalAnswers(prev => prev + 1);
+      }
+      nextVerb();
+    }}
     className="w-full sm:w-auto"
   >
     Następne
@@ -246,7 +267,12 @@ return (
 
   <Button
     variant="outline"
-    onClick={() => setShowAnswer(true)}
+    onClick={() => {
+      if (!showAnswer && !answeredCorrectly) {
+        setTotalAnswers(prev => prev + 1);
+      }
+      setShowAnswer(true);
+    }}
     className="w-full sm:w-auto"
   >
     Pokaż odpowiedź
