@@ -107,75 +107,108 @@ const verbs = [
 ];
 
 export default function IrregularVerbsTrainer() {
-  const [currentVerb, setCurrentVerb] = useState(verbs[0]);
+  const getRandomVerb = (list: typeof verbs) =>
+    list[Math.floor(Math.random() * list.length)];
+
+  const [remainingVerbs, setRemainingVerbs] = useState([...verbs]);
+  const [currentVerb, setCurrentVerb] = useState(getRandomVerb(verbs));
   const [timeSpent, setTimeSpent] = useState(0);
   const [inputBase, setInputBase] = useState("");
   const [inputPast, setInputPast] = useState("");
-  const baseInputRef = useRef<HTMLInputElement>(null);
   const [inputParticiple, setInputParticiple] = useState("");
+  const baseInputRef = useRef<HTMLInputElement>(null);
   const [result, setResult] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
   const [totalAnswers, setTotalAnswers] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
 
-useEffect(() => {
-  const interval = setInterval(() => {
-    setTimeSpent(prev => prev + 1);
-  }, 1000);
-  return () => clearInterval(interval); // czyścimy po odmontowaniu
-}, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeSpent((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const resetTrainer = () => {
+    const freshVerbs = [...verbs];
+    const randomVerb = getRandomVerb(freshVerbs);
+    setRemainingVerbs(freshVerbs);
+    setCurrentVerb(randomVerb);
+    setInputBase("");
+    setInputPast("");
+    setInputParticiple("");
+    setTimeSpent(0);
+    setResult("");
+    setShowAnswer(false);
+    setAnsweredCorrectly(false);
+    setTotalAnswers(0);
+    setCorrectAnswers(0);
+  };
 
   const checkAnswers = () => {
     const isBaseCorrect = inputBase.trim().toLowerCase() === currentVerb.base;
     const isPastCorrect = inputPast.trim().toLowerCase() === currentVerb.past;
-    const isParticipleCorrect = inputParticiple.trim().toLowerCase() === currentVerb.participle;
+    const isParticipleCorrect =
+      inputParticiple.trim().toLowerCase() === currentVerb.participle;
 
-    setTotalAnswers(prev => prev + 1);
+    setTotalAnswers((prev) => prev + 1);
 
     if (isBaseCorrect && isPastCorrect && isParticipleCorrect) {
       setResult("✅ Wszystko poprawnie!");
-      setCorrectAnswers(prev => prev + 1);
+      setCorrectAnswers((prev) => prev + 1);
       setAnsweredCorrectly(true);
+
+      setRemainingVerbs((prev) =>
+        prev.filter((v) => v.base !== currentVerb.base)
+      );
     } else {
       setResult("❌ Błąd. Spróbuj ponownie lub pokaż odpowiedź.");
     }
   };
 
-const nextVerb = () => {
-  const randomIndex = Math.floor(Math.random() * verbs.length);
-  setCurrentVerb(verbs[randomIndex]);
-  setInputBase("");
-  setInputPast("");
-  setInputParticiple("");
-  setResult("");
-  setShowAnswer(false);
-  setAnsweredCorrectly(false);
-  // ustaw focus po renderze
-  setTimeout(() => {
-    baseInputRef.current?.focus();
-  }, 0);
-};
-
-const formatTime = (totalSeconds: number) => {
-  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-  const seconds = String(totalSeconds % 60).padStart(2, "0");
-  return `${hours}:${minutes}:${seconds}`;
-};
-
-const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-  if (e.key === "Enter") {
-    if (showAnswer || answeredCorrectly) {
-      nextVerb();
-    } else {
-      checkAnswers();
+  const nextVerb = () => {
+    if (remainingVerbs.length === 0) {
+      setResult("🎉 Wszystkie czasowniki zostały rozwiązane!");
+      return;
     }
-  } else if (e.key === " ") {
-    e.preventDefault();
-    setShowAnswer(true);
-  }
-};
+
+    const randomVerb = getRandomVerb(remainingVerbs);
+    setCurrentVerb(randomVerb);
+    setInputBase("");
+    setInputPast("");
+    setInputParticiple("");
+    setResult("");
+    setShowAnswer(false);
+    setAnsweredCorrectly(false);
+
+    setTimeout(() => {
+      baseInputRef.current?.focus();
+    }, 0);
+  };
+
+  const formatTime = (totalSeconds: number) => {
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+      2,
+      "0"
+    );
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter") {
+      if (showAnswer || answeredCorrectly) {
+        nextVerb();
+      } else {
+        checkAnswers();
+      }
+    } else if (e.key === " ") {
+      e.preventDefault();
+      setShowAnswer(true);
+    }
+  };
 
   const getAccuracy = () => {
     if (totalAnswers === 0) return 0;
@@ -185,119 +218,139 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
   const accuracy = getAccuracy();
   const accuracyColor = accuracy >= 80 ? "text-green-600" : "text-red-600";
 
-  
-return (
-  <div
-    className="max-w-3xl mx-auto mt-10 p-4 bg-gray-900 text-white rounded shadow-md"
-    onKeyDown={handleKeyDown}
-    tabIndex={0}
-  >
-    <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2 md:gap-0">
-      <h1 className="text-2xl font-bold text-center md:text-left">
-        Trener czasowników nieregularnych
-      </h1>
+  return (
+    <div
+      className="max-w-3xl mx-auto mt-10 p-4 bg-gray-900 text-white rounded shadow-md"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+    >
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2 md:gap-0">
+        <h1 className="text-2xl font-bold text-center md:text-left">
+          Trener czasowników nieregularnych
+        </h1>
 <div className={`text-center md:text-right text-sm md:text-base ${accuracyColor}`}>
   <p>Odpowiedzi: <strong>{correctAnswers}/{totalAnswers}</strong></p>
   <p>Skuteczność: <strong>{accuracy}%</strong></p>
   <p>Czas: <strong>{formatTime(timeSpent)}</strong></p>
+  <p>Poprawne: <strong>{correctAnswers}</strong></p>
+  <p>Pozostało: <strong>{remainingVerbs.length} z {verbs.length}</strong></p>
 </div>
+      </div>
+
+      <Card className="bg-gray-800 text-white shadow-xl">
+        <CardContent className="space-y-4">
+          <h2 className="text-xl font-semibold text-center md:text-left">
+            Tłumaczenie:{" "}
+            <span className="text-blue-400">{currentVerb.translation}</span>
+          </h2>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-1 text-gray-300">Base:</label>
+              <input
+                ref={baseInputRef}
+                value={inputBase}
+                onChange={(e) => setInputBase(e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-gray-300">Past Simple:</label>
+              <Input
+                value={inputPast}
+                onChange={(e) => setInputPast(e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-gray-300">
+                Past Participle:
+              </label>
+              <Input
+                value={inputParticiple}
+                onChange={(e) => setInputParticiple(e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 text-white"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:justify-start sm:gap-2 gap-2">
+            <Button
+              onClick={() => {
+                if (showAnswer || answeredCorrectly) {
+                  nextVerb();
+                } else {
+                  checkAnswers();
+                }
+              }}
+              className="w-full sm:w-auto"
+            >
+              Sprawdź
+            </Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (!answeredCorrectly && !showAnswer) {
+                  setTotalAnswers((prev) => prev + 1);
+                }
+                nextVerb();
+              }}
+              className="w-full sm:w-auto"
+            >
+              Następne
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!showAnswer && !answeredCorrectly) {
+                  setTotalAnswers((prev) => prev + 1);
+                }
+                setShowAnswer(true);
+              }}
+              className="w-full sm:w-auto"
+            >
+              Pokaż odpowiedź
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={resetTrainer}
+              className="w-full sm:w-auto"
+            >
+              Resetuj
+            </Button>
+          </div>
+
+          {result && (
+            <p className="text-lg font-medium text-center md:text-left text-green-400">
+              {result}
+            </p>
+          )}
+
+          {showAnswer && (
+            <div className="text-sm text-gray-300 text-center md:text-left">
+              <p>
+                Base: <strong>{currentVerb.base}</strong>
+              </p>
+              <p>
+                Past: <strong>{currentVerb.past}</strong>
+              </p>
+              <p>
+                Participle: <strong>{currentVerb.participle}</strong>
+              </p>
+            </div>
+          )}
+
+          <div className="text-xs text-gray-500 pt-4 text-center">
+            <p>
+              TAB - Przejdź do następnego pola, Enter — sprawdź / przejdź
+              dalej, Spacja — pokaż odpowiedź
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
-
-    <Card className="bg-gray-800 text-white shadow-xl">
-      <CardContent className="space-y-4">
-        <h2 className="text-xl font-semibold text-center md:text-left">
-          Tłumaczenie: <span className="text-blue-400">{currentVerb.translation}</span>
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block mb-1 text-gray-300">Base:</label>
-            <input
-              ref={baseInputRef}
-              value={inputBase}
-              onChange={(e) => setInputBase(e.target.value)}
-              className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 text-gray-300">Past Simple:</label>
-            <Input
-              value={inputPast}
-              onChange={(e) => setInputPast(e.target.value)}
-              className="w-full bg-gray-700 border border-gray-600 text-white"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 text-gray-300">Past Participle:</label>
-            <Input
-              value={inputParticiple}
-              onChange={(e) => setInputParticiple(e.target.value)}
-              className="w-full bg-gray-700 border border-gray-600 text-white"
-            />
-          </div>
-        </div>
-
-<div className="flex flex-col sm:flex-row sm:justify-start sm:gap-2 gap-2">
-  <Button
-    onClick={() => {
-      if (showAnswer || answeredCorrectly) {
-        nextVerb();
-      } else {
-        checkAnswers();
-      }
-    }}
-    className="w-full sm:w-auto"
-  >
-    Sprawdź
-  </Button>
-
-  <Button
-    variant="secondary"
-    onClick={() => {
-      // Jeżeli nie było poprawnej odpowiedzi ani nie pokazano odpowiedzi, traktuj jako błąd
-      if (!answeredCorrectly && !showAnswer) {
-        setTotalAnswers(prev => prev + 1);
-      }
-      nextVerb();
-    }}
-    className="w-full sm:w-auto"
-  >
-    Następne
-  </Button>
-
-  <Button
-    variant="outline"
-    onClick={() => {
-      if (!showAnswer && !answeredCorrectly) {
-        setTotalAnswers(prev => prev + 1);
-      }
-      setShowAnswer(true);
-    }}
-    className="w-full sm:w-auto"
-  >
-    Pokaż odpowiedź
-  </Button>
-</div>
-
-
-        {result && (
-          <p className="text-lg font-medium text-center md:text-left text-green-400">
-            {result}
-          </p>
-        )}
-
-        {showAnswer && (
-          <div className="text-sm text-gray-300 text-center md:text-left">
-            <p>Base: <strong>{currentVerb.base}</strong></p>
-            <p>Past: <strong>{currentVerb.past}</strong></p>
-            <p>Participle: <strong>{currentVerb.participle}</strong></p>
-          </div>
-        )}
-
-        <div className="text-xs text-gray-500 pt-4 text-center">
-          <p>TAB - Przejdź do następnego pola, Enter — sprawdź / przejdź dalej, Spacja — pokaż odpowiedź</p>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);}
+  );
+}
